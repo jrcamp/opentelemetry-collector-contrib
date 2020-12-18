@@ -60,6 +60,9 @@ The following configuration options can also be configured:
   processor is enabled in the pipeline with one of the cloud provider detectors
   or environment variable detector setting a unique value to `host.name` attribute
   within your k8s cluster. And keep `override=true` in resourcedetection config.
+- `extra_allowed_dimension_key_chars` (default = `"_-"`) A string of characters
+that are allowed to be used as a dimension key in addition to alphanumeric
+  characters. If a character does not allowed it is replace with a `_`.
 
 In addition, this exporter offers queued retry which is enabled by default.
 Information about queued retry configuration parameters can be found

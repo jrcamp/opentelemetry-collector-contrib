@@ -103,7 +103,7 @@ func newSignalFxExporter(
 		},
 		logger:                 logger,
 		accessTokenPassthrough: config.AccessTokenPassthrough,
-		converter:              translation.NewMetricsConverter(logger, options.metricTranslator),
+		converter:              translation.NewMetricsConverter(logger, config.ExtraAllowedDimensionKeyChars, options.metricTranslator),
 	}
 
 	dimClient := dimensions.NewDimensionClient(

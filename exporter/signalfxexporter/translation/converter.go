@@ -51,13 +51,14 @@ var (
 type MetricsConverter struct {
 	logger           *zap.Logger
 	metricTranslator *MetricTranslator
+	safeDimKeyChars  string
 }
 
 // NewMetricsConverter creates a MetricsConverter from the passed in logger and
 // MetricTranslator. Pass in a nil MetricTranslator to not use translation
 // rules.
-func NewMetricsConverter(logger *zap.Logger, t *MetricTranslator) *MetricsConverter {
-	return &MetricsConverter{logger: logger, metricTranslator: t}
+func NewMetricsConverter(logger *zap.Logger, safeDimKeyChars string, t *MetricTranslator) *MetricsConverter {
+	return &MetricsConverter{logger: logger, safeDimKeyChars: safeDimKeyChars, metricTranslator: t}
 }
 
 // MetricDataToSignalFxV2 converts the passed in MetricsData to SFx datapoints,
@@ -79,7 +80,7 @@ func (c *MetricsConverter) MetricDataToSignalFxV2(rm pdata.ResourceMetrics) []*s
 			sfxDatapoints = append(sfxDatapoints, dps...)
 		}
 	}
-	sanitizeDataPointDimensions(sfxDatapoints)
+	c.sanitizeDataPointDimensions(sfxDatapoints)
 	return sfxDatapoints
 }
 
@@ -329,17 +330,17 @@ func convertDoubleHistogram(histDPs pdata.DoubleHistogramDataPointSlice, basePoi
 
 // sanitizeDataPointLabels replaces all characters unsupported by SignalFx backend
 // in metric label keys and with "_"
-func sanitizeDataPointDimensions(dps []*sfxpb.DataPoint) {
+func (c *MetricsConverter) sanitizeDataPointDimensions(dps []*sfxpb.DataPoint) {
 	for _, dp := range dps {
 		for _, d := range dp.Dimensions {
-			d.Key = filterKeyChars(d.Key)
+			d.Key = filterKeyChars(d.Key, c.safeDimKeyChars)
 		}
 	}
 }
 
-func filterKeyChars(str string) string {
+func filterKeyChars(str string, safeChars string) string {
 	filterMap := func(r rune) rune {
-		if unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_' || r == '-' {
+		if unicode.IsLetter(r) || unicode.IsDigit(r) || strings.ContainsRune(safeChars, r) {
 			return r
 		}
 		return '_'

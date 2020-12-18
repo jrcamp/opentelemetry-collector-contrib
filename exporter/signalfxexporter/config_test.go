@@ -85,7 +85,8 @@ func TestLoadConfig(t *testing.T) {
 		}, AccessTokenPassthroughConfig: splunk.AccessTokenPassthroughConfig{
 			AccessTokenPassthrough: false,
 		},
-		SendCompatibleMetrics: true,
+		ExtraAllowedDimensionKeyChars: "_-",
+		SendCompatibleMetrics:         true,
 		TranslationRules: []translation.Rule{
 			{
 				Action: translation.ActionRenameDimensionKeys,

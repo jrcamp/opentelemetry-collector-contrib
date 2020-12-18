@@ -63,10 +63,11 @@ func createDefaultConfig() configmodels.Exporter {
 		AccessTokenPassthroughConfig: splunk.AccessTokenPassthroughConfig{
 			AccessTokenPassthrough: true,
 		},
-		SendCompatibleMetrics: false,
-		TranslationRules:      nil,
-		DeltaTranslationTTL:   3600,
-		Correlation:           correlation.DefaultConfig(),
+		SendCompatibleMetrics:         false,
+		ExtraAllowedDimensionKeyChars: "_-",
+		TranslationRules:              nil,
+		DeltaTranslationTTL:           3600,
+		Correlation:                   correlation.DefaultConfig(),
 	}
 }
 

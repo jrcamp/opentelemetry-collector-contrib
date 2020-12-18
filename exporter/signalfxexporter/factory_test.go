@@ -295,7 +295,7 @@ func TestDefaultTranslationRules(t *testing.T) {
 	require.NoError(t, err)
 	data := testMetricsData()
 
-	c := translation.NewMetricsConverter(zap.NewNop(), tr)
+	c := translation.NewMetricsConverter(zap.NewNop(), "", tr)
 	translated := c.MetricDataToSignalFxV2(data)
 	require.NotNil(t, translated)
 

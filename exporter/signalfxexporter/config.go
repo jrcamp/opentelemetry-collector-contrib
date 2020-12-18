@@ -67,6 +67,9 @@ type Config struct {
 	// SignalFx naming conventions, "false" by default.
 	SendCompatibleMetrics bool `mapstructure:"send_compatible_metrics"`
 
+	// ExtraAllowedDimensionKeyChars is a list of allowable characters in addition to alphanumeric ones.
+	ExtraAllowedDimensionKeyChars string `mapstructure:"extra_allowed_dimension_key_chars"`
+
 	// TranslationRules defines a set of rules how to translate metrics to a SignalFx compatible format
 	// Rules defined in translation/constants.go are used by default.
 	TranslationRules []translation.Rule `mapstructure:"translation_rules"`

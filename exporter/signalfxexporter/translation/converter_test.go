@@ -484,7 +484,7 @@ func Test_MetricDataToSignalFxV2(t *testing.T) {
 			wantSfxDataPoints: expectedFromIntHistogram("no_bucket_histo", tsMSecs, labelMap, histDPNoBuckets, false),
 		},
 	}
-	c := NewMetricsConverter(logger, nil)
+	c := NewMetricsConverter(logger, "", nil)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			gotSfxDataPoints := c.MetricDataToSignalFxV2(tt.metricsDataFn())
@@ -534,7 +534,7 @@ func TestMetricDataToSignalFxV2WithTranslation(t *testing.T) {
 			},
 		},
 	}
-	c := NewMetricsConverter(zap.NewNop(), translator)
+	c := NewMetricsConverter(zap.NewNop(), "", translator)
 	assert.EqualValues(t, expected, c.MetricDataToSignalFxV2(wrapMetric(md)))
 }
 

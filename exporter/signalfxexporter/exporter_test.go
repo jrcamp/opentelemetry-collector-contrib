@@ -196,7 +196,7 @@ func TestConsumeMetrics(t *testing.T) {
 					}},
 				},
 				logger:    zap.NewNop(),
-				converter: translation.NewMetricsConverter(zap.NewNop(), nil),
+				converter: translation.NewMetricsConverter(zap.NewNop(), "", nil),
 			}
 
 			numDroppedTimeSeries, err := dpClient.pushMetricsData(context.Background(), tt.md)
@@ -972,7 +972,7 @@ func BenchmarkExporterConsumeData(b *testing.B) {
 			}},
 		},
 		logger:    zap.NewNop(),
-		converter: translation.NewMetricsConverter(zap.NewNop(), nil),
+		converter: translation.NewMetricsConverter(zap.NewNop(), "", nil),
 	}
 
 	for i := 0; i < b.N; i++ {
