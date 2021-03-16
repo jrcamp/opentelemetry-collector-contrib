@@ -176,6 +176,8 @@ func (c *client) chunk(ctx context.Context, ld pdata.Logs, max int, send func(ct
 	// Provide 5000 overflow because it overruns the max content length then trims it block. Hopefully will prevent
 	// extra allocation.
 	buf := bytes.NewBuffer(make([]byte, 0, max+5_000))
+	overflowMessage := bytes.NewBuffer(make([]byte, 0, 5000))
+
 	encoder := json.NewEncoder(buf)
 	checkPoint := 0
 	var logIdx logIndex
@@ -194,22 +196,30 @@ func (c *client) chunk(ctx context.Context, ld pdata.Logs, max int, send func(ct
 
 				buf.WriteString("\r\n\r\n")
 
-				if buf.Len() >= max {
-					// May want to check if checkPoint == 0 ?
-					buf.Truncate(checkPoint)
-					if err := send(ctx, buf); err != nil {
-						return numDroppedLogs, consumererror.PartialLogsError(err, subLog(ld, logIdx))
-					}
-					logIdx = logIndex{
-						origIdx: i,
-						instIdx: j,
-						logsIdx: k,
-					}
-					buf.Reset()
-					checkPoint = 0
+				if buf.Len() < max {
+					checkPoint = buf.Len()
+					continue
 				}
 
-				checkPoint = buf.Len()
+				// If here then have reached max.
+				// May want to check if checkPoint == 0 ?
+				// Save current message that overflowed.
+				overflowMessage.Reset()
+				overflowMessage.Write(buf.Bytes()[checkPoint:buf.Len()])
+
+				buf.Truncate(checkPoint)
+				if err := send(ctx, buf); err != nil {
+					return numDroppedLogs, consumererror.PartialLogsError(err, subLog(ld, logIdx))
+				}
+				logIdx = logIndex{
+					origIdx: i,
+					instIdx: j,
+					logsIdx: k,
+				}
+
+				buf.Reset()
+				checkPoint = 0
+				overflowMessage.WriteTo(buf)
 			}
 		}
 	}
