@@ -96,13 +96,14 @@ type ExtractConfig struct {
 //
 //   procesors:
 //     k8s-tagger:
-//       annotations:
-//         - name: git.sha
-//           key: kubernetes.io/change-cause
-//           regex: GIT_SHA=(?P<value>\w+)
-//         - name: ci.build
-//	         key: kubernetes.io/change-cause
-//           regex: JENKINS=(?P<value>[\w]+)
+//       extract:
+//         annotations:
+//           - tag_name: git.sha
+//             key: kubernetes.io/change-cause
+//             regex: GIT_SHA=(?P<value>\w+)
+//           - tag_name: ci.build
+//	           key: kubernetes.io/change-cause
+//             regex: JENKINS=(?P<value>[\w]+)
 //
 //   this will add the `git.sha` and `ci.build` tags to the spans or metrics.
 type FieldExtractConfig struct {

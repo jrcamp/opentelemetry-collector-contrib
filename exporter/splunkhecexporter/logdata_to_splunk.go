@@ -32,7 +32,7 @@ func logDataToSplunk(logger *zap.Logger, ld pdata.Logs, config *Config) []*splun
 		for j := 0; j < ills.Len(); j++ {
 			logs := ills.At(j).Logs()
 			for k := 0; k < logs.Len(); k++ {
-				splunkEvents = append(splunkEvents, mapLogRecordToSplunkEvent(logs.At(k), config, logger))
+				splunkEvents = append(splunkEvents, mapLogRecordToSplunkEvent(rls.At(i), logs.At(k), config, logger))
 			}
 		}
 	}
@@ -40,12 +40,28 @@ func logDataToSplunk(logger *zap.Logger, ld pdata.Logs, config *Config) []*splun
 	return splunkEvents
 }
 
-func mapLogRecordToSplunkEvent(lr pdata.LogRecord, config *Config, logger *zap.Logger) *splunk.Event {
+func mapLogRecordToSplunkEvent(rls pdata.ResourceLogs, lr pdata.LogRecord, config *Config, logger *zap.Logger) *splunk.Event {
 	host := unknownHostName
 	source := config.Source
 	sourcetype := config.SourceType
 	index := config.Index
 	fields := map[string]interface{}{}
+	rls.Resource().Attributes().ForEach(func(k string, v pdata.AttributeValue) {
+		switch k {
+		case conventions.AttributeHostName:
+			host = v.StringVal()
+			fields[k] = v.StringVal()
+		case conventions.AttributeServiceName:
+			source = v.StringVal()
+			fields[k] = v.StringVal()
+		case splunk.SourcetypeLabel:
+			sourcetype = v.StringVal()
+		case splunk.IndexLabel:
+			index = v.StringVal()
+		default:
+			fields[k] = convertAttributeValue(v, logger)
+		}
+	})
 	lr.Attributes().ForEach(func(k string, v pdata.AttributeValue) {
 		switch k {
 		case conventions.AttributeHostName:
