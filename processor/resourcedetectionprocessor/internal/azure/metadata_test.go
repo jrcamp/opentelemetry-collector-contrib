@@ -40,7 +40,7 @@ func TestQueryEndpointFailed(t *testing.T) {
 		client:   &http.Client{},
 	}
 
-	_, err := provider.metadata(context.Background())
+	_, err := provider.Metadata(context.Background())
 	assert.Error(t, err)
 }
 
@@ -55,7 +55,7 @@ func TestQueryEndpointMalformed(t *testing.T) {
 		client:   &http.Client{},
 	}
 
-	_, err := provider.metadata(context.Background())
+	_, err := provider.Metadata(context.Background())
 	assert.Error(t, err)
 }
 
@@ -81,7 +81,7 @@ func TestQueryEndpointCorrect(t *testing.T) {
 		client:   &http.Client{},
 	}
 
-	recvMetadata, err := provider.metadata(context.Background())
+	recvMetadata, err := provider.Metadata(context.Background())
 
 	require.NoError(t, err)
 	assert.Equal(t, *sentMetadata, *recvMetadata)

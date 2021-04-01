@@ -30,9 +30,10 @@ const (
 	metadataEndpoint = "http://169.254.169.254/metadata/instance/compute"
 )
 
-// azureProvider gets metadata from the Azure IMDS
-type azureProvider interface {
-	metadata(ctx context.Context) (*computeMetadata, error)
+// AzureProvider gets metadata from the Azure IMDS
+type AzureProvider interface {
+	Metadata(ctx context.Context) (*computeMetadata, error)
+	Available(ctx context.Context) bool
 }
 
 type azureProviderImpl struct {
@@ -41,7 +42,7 @@ type azureProviderImpl struct {
 }
 
 // newProvider creates a new metadata provider
-func newProvider() azureProvider {
+func newProvider() AzureProvider {
 	return &azureProviderImpl{
 		endpoint: metadataEndpoint,
 		client:   &http.Client{},
@@ -59,8 +60,14 @@ type computeMetadata struct {
 	VMScaleSetName    string `json:"vmScaleSetName"`
 }
 
-// queryEndpointWithContext queries a given endpoint and parses the output to the Azure IMDS format
-func (p *azureProviderImpl) metadata(ctx context.Context) (*computeMetadata, error) {
+// Available returns whether the endpoint is available or not.
+func (p *azureProviderImpl) Available(ctx context.Context) bool {
+	_, err := p.Metadata(ctx)
+	return err != nil
+}
+
+// Metadata queries IMDS endpoint and parses the output to the Azure IMDS format
+func (p *azureProviderImpl) Metadata(ctx context.Context) (*computeMetadata, error) {
 	const (
 		// API version used
 		apiVersionKey = "api-version"

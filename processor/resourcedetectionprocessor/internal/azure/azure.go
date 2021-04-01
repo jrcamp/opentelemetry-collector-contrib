@@ -34,7 +34,7 @@ var _ internal.Detector = (*Detector)(nil)
 
 // Detector is an Azure metadata detector
 type Detector struct {
-	provider azureProvider
+	provider AzureProvider
 }
 
 // NewDetector creates a new Azure metadata detector
@@ -47,7 +47,7 @@ func (d *Detector) Detect(ctx context.Context) (pdata.Resource, error) {
 	res := pdata.NewResource()
 	attrs := res.Attributes()
 
-	compute, err := d.provider.metadata(ctx)
+	compute, err := d.provider.Metadata(ctx)
 	if err != nil {
 		return res, fmt.Errorf("failed getting metadata: %w", err)
 	}
